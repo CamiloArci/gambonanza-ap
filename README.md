@@ -1,2 +1,2 @@
 # gambonanza-ap
-Gambonanza Archipelago mod including its randomizer 
+Gambonanza Archipelago mod
