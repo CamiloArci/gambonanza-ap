@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>GambonanzaAP</AssemblyName>
+    <Description>Archipelago Randomizer for Gambonanza</Description>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.0" />
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Gambonanza\Gambonanza\Gambonanza_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Blukulele.Core">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Gambonanza\Gambonanza\Gambonanza_Data\Managed\Blukulele.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Blukulele.SaveSystem">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Gambonanza\Gambonanza\Gambonanza_Data\Managed\Blukulele.SaveSystem.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
