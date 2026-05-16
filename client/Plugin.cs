@@ -80,10 +80,46 @@ namespace GambonanzaAP
             AP.Update();
         }
 
-        // We'll hijack the first gambit slot visual
+        [HarmonyPatch(typeof(WinCanvas), "ButtonClick")]
+        public static class WinCanvasPatch
+        {
+            [HarmonyPrefix]
+            static void Prefix()
+            {
+                int wave = SingletonMonoBehaviour<ChessDataManager>.Instance.CurrentWave;
+                int stage = (wave - 1) / 5 + 1;
+                int game = (wave - 1) % 5 + 1;
+                
+                string locName = $"Stage {stage} Game {game}";
+                Log.LogInfo($"Level completed: {locName}. Sending check...");
+                AP.SendLocation(locName);
+            }
+        }
+
+        [HarmonyPatch(typeof(FinalBoss_Behaviour), "Die")]
+        public static class FinalBossPatch
+        {
+            [HarmonyPostfix]
+            static void Postfix()
+            {
+                Log.LogInfo("Final Boss defeated! Completing goal...");
+                AP.MarkGoalAsReached();
+            }
+        }
+
         [HarmonyPatch(typeof(GambitToBuy), "Initialize")]
         public static class ShopVisualPatch
         {
+            [HarmonyPrefix]
+            static void Prefix(GambitToBuy __instance, SO_Gambit gambit, ref bool locked)
+            {
+                // Lock the gambit if it hasn't been received from AP yet
+                if (!AP.IsGambitUnlocked(gambit.GambitName))
+                {
+                    locked = true;
+                }
+            }
+
             [HarmonyPostfix]
             static void Postfix(GambitToBuy __instance, SO_Gambit gambit)
             {
@@ -104,7 +140,27 @@ namespace GambonanzaAP
                         if (rarity != null) rarity.text = "ARCHIPELAGO";
                         
                         __instance.gameObject.name = "AP_CHECK_SLOT";
+                        
+                        // Ensure the AP Check is never locked
+                        AccessTools.Field(typeof(GambitToBuy), "m_LockButton").GetValue(__instance).GetType().GetMethod("Initialize").Invoke(
+                            AccessTools.Field(typeof(GambitToBuy), "m_LockButton").GetValue(__instance),
+                            new object[] { "ap_check", false }
+                        );
                     }
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(PieceToBuyButton), "Initialize")]
+        public static class PieceShopPatch
+        {
+            [HarmonyPrefix]
+            static void Prefix(PieceToBuyButton __instance, PieceType pieceType, ref bool locked)
+            {
+                // Lock the piece if it hasn't been received from AP yet
+                if (!AP.IsPieceUnlocked(pieceType))
+                {
+                    locked = true;
                 }
             }
         }

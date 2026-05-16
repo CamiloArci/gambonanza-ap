@@ -50,6 +50,30 @@ namespace GambonanzaAP
             }
         }
 
+        public void MarkGoalAsReached()
+        {
+            if (!IsConnected) return;
+            var statusUpdatePacket = new Archipelago.MultiClient.Net.Packets.StatusUpdatePacket();
+            statusUpdatePacket.Status = ArchipelagoClientState.ClientGoal;
+            session.Socket.SendPacket(statusUpdatePacket);
+            Plugin.Log.LogInfo("Goal Reached! Victory sent to server.");
+        }
+
+        public bool IsGambitUnlocked(string internalName)
+        {
+            // Find the AP item name for this internal name
+            string apName = ItemToInternalName.FirstOrDefault(x => x.Value == internalName).Key;
+            if (string.IsNullOrEmpty(apName)) return true; // If not in AP pool, it's always unlocked
+            return ReceivedItems.Contains(apName);
+        }
+
+        public bool IsPieceUnlocked(PieceType type)
+        {
+            // Capitalize logic: PAWN -> Pawn
+            string formattedName = type.ToString().Substring(0, 1).ToUpper() + type.ToString().Substring(1).ToLower() + " Piece";
+            return ReceivedItems.Contains(formattedName);
+        }
+
         private void OnItemReceived(ReceivedItemsHelper helper)
         {
             var item = helper.DequeueItem();
