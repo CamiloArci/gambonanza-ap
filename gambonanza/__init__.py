@@ -1,19 +1,15 @@
 from .Items import item_table
 from .Locations import location_table
-from world.AutoWorld import World, WebWorld
+from worlds.AutoWorld import World, WebWorld
 from BaseClasses import Region, Location, Item, ItemClassification, Entrance, Tutorial
 from typing import List
 
+class GambonanzaLocation(Location):
+    game = "Gambonanza"
+
 class GambonanzaWebWorld(WebWorld):
-    theme = "ice" # Example theme
-    tutorials = [Tutorial(
-        "Gambonanza Archipelago Setup Guide",
-        "A guide to setting up the Gambonanza randomizer mod.",
-        "English",
-        "setup_en.md",
-        "setup/en",
-        ["Arci"]
-    )]
+    theme = "ice"
+    tutorials = []
 
 class GambonanzaWorld(World):
     """
@@ -56,6 +52,3 @@ class GambonanzaWorld(World):
     def create_item(self, name: str) -> Item:
         data = item_table[name]
         return Item(name, data.classification, data.code, self.player)
-
-class GambonanzaLocation(Location):
-    game = "Gambonanza"
