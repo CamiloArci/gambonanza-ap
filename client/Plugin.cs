@@ -20,21 +20,33 @@ namespace GambonanzaAP
         public static ConfigEntry<string> ConfigUser;
         public static ConfigEntry<string> ConfigPass;
 
+        private bool showUI = false;
+        private string uiServer = "";
+        private string uiSlot = "";
+        private string uiPassword = "";
+        private string connectionError = "";
+        private bool isConnecting = false;
+        private UnityEngine.Rect windowRect;
+
         private void Awake()
         {
             Log = Logger;
             AP = new ArchipelagoClient();
 
-            ConfigServer = Config.Bind("Archipelago", "Server", "archipelago.gg:38281", "Archipelago server address");
-            ConfigUser = Config.Bind("Archipelago", "SlotName", "Player1", "Your slot name");
+            ConfigServer = Config.Bind("Archipelago", "Server", "", "Archipelago server address");
+            ConfigUser = Config.Bind("Archipelago", "SlotName", "", "Your slot name");
             ConfigPass = Config.Bind("Archipelago", "Password", "", "Server password");
+
+            uiServer = ConfigServer.Value;
+            uiSlot = ConfigUser.Value;
+            uiPassword = ConfigPass.Value;
 
             Harmony harmony = new Harmony("com.arci.gambonanza.ap");
             harmony.PatchAll();
 
             Log.LogInfo("Gambonanza Archipelago Loaded!");
             
-            // Auto-connect on startup
+            // Auto-connect on startup only if config has valid entries
             TryConnect();
         }
 
@@ -57,24 +69,142 @@ namespace GambonanzaAP
         {
             if (string.IsNullOrEmpty(ConfigServer.Value) || string.IsNullOrEmpty(ConfigUser.Value))
             {
-                Log.LogWarning("Archipelago Config not set. Skipping auto-connect.");
+                Log.LogWarning("Archipelago Config is blank. Opening connection UI.");
+                showUI = true;
+                windowRect = new UnityEngine.Rect((UnityEngine.Screen.width - 400) / 2, (UnityEngine.Screen.height - 300) / 5, 400, 300);
                 return;
             }
 
             Log.LogInfo($"Connecting to {ConfigServer.Value} as {ConfigUser.Value}...");
-            if (!AP.Connect(ConfigServer.Value, ConfigUser.Value, ConfigPass.Value))
+            isConnecting = true;
+            try
             {
-                Log.LogFatal("CONNECTION FAILED! Closing game as requested.");
-                UnityEngine.Application.Quit();
+                if (!AP.Connect(ConfigServer.Value, ConfigUser.Value, ConfigPass.Value))
+                {
+                    Log.LogError("CONNECTION FAILED! Opening connection UI.");
+                    connectionError = "Connection failed. Please verify credentials/server status.";
+                    showUI = true;
+                    windowRect = new UnityEngine.Rect((UnityEngine.Screen.width - 400) / 2, (UnityEngine.Screen.height - 300) / 5, 400, 300);
+                    isConnecting = false;
+                }
+                else
+                {
+                    showUI = false;
+                    connectionError = "";
+                    isConnecting = false;
+                }
             }
+            catch (Exception ex)
+            {
+                Log.LogError($"Exception during startup connection: {ex.Message}");
+                connectionError = $"Error: {ex.Message}";
+                showUI = true;
+                windowRect = new UnityEngine.Rect((UnityEngine.Screen.width - 400) / 2, (UnityEngine.Screen.height - 300) / 5, 400, 300);
+                isConnecting = false;
+            }
+        }
+
+        private void ConnectFromUI()
+        {
+            if (string.IsNullOrEmpty(uiServer) || string.IsNullOrEmpty(uiSlot))
+            {
+                connectionError = "Server and Slot name cannot be empty.";
+                return;
+            }
+
+            connectionError = "";
+            isConnecting = true;
+            Log.LogInfo($"Connecting to {uiServer} as {uiSlot}...");
+            try
+            {
+                if (AP.Connect(uiServer, uiSlot, uiPassword))
+                {
+                    ConfigServer.Value = uiServer;
+                    ConfigUser.Value = uiSlot;
+                    ConfigPass.Value = uiPassword;
+                    Config.Save();
+
+                    showUI = false;
+                    isConnecting = false;
+                }
+                else
+                {
+                    connectionError = "Connection failed. Please check logs.";
+                    isConnecting = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogError($"Exception during UI connection: {ex.Message}");
+                connectionError = $"Error: {ex.Message}";
+                isConnecting = false;
+            }
+        }
+
+        private void OnGUI()
+        {
+            if (!showUI) return;
+
+            // Enforce cursor visibility and interaction when UI is active
+            UnityEngine.Cursor.visible = true;
+            UnityEngine.Cursor.lockState = UnityEngine.CursorLockMode.None;
+
+            windowRect = UnityEngine.GUI.Window(9999, windowRect, DrawWindow, "Archipelago Connection Settings");
+        }
+
+        private void DrawWindow(int windowID)
+        {
+            UnityEngine.GUI.DragWindow(new UnityEngine.Rect(0, 0, 400, 20));
+
+            UnityEngine.GUILayout.BeginArea(new UnityEngine.Rect(20, 30, 360, 250));
+
+            UnityEngine.GUILayout.Label("Server Address (IP:Port):");
+            uiServer = UnityEngine.GUILayout.TextField(uiServer);
+
+            UnityEngine.GUILayout.Space(10);
+            UnityEngine.GUILayout.Label("Slot Name (User):");
+            uiSlot = UnityEngine.GUILayout.TextField(uiSlot);
+
+            UnityEngine.GUILayout.Space(10);
+            UnityEngine.GUILayout.Label("Password (Optional):");
+            uiPassword = UnityEngine.GUILayout.PasswordField(uiPassword, '*');
+
+            UnityEngine.GUILayout.Space(15);
+
+            if (!string.IsNullOrEmpty(connectionError))
+            {
+                UnityEngine.GUI.color = UnityEngine.Color.red;
+                UnityEngine.GUILayout.Label(connectionError);
+                UnityEngine.GUI.color = UnityEngine.Color.white;
+            }
+
+            UnityEngine.GUILayout.FlexibleSpace();
+
+            if (isConnecting)
+            {
+                UnityEngine.GUILayout.Label("Connecting...");
+            }
+            else
+            {
+                if (UnityEngine.GUILayout.Button("Connect") || 
+                    (UnityEngine.Event.current.type == UnityEngine.EventType.KeyDown && UnityEngine.Event.current.keyCode == UnityEngine.KeyCode.Return))
+                {
+                    ConnectFromUI();
+                }
+            }
+
+            UnityEngine.GUILayout.EndArea();
         }
 
         private void Update()
         {
             if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F8))
             {
-                Log.LogInfo("Manual reconnection triggered via F8...");
-                TryConnect();
+                showUI = !showUI;
+                if (showUI)
+                {
+                    windowRect = new UnityEngine.Rect((UnityEngine.Screen.width - 400) / 2, (UnityEngine.Screen.height - 300) / 5, 400, 300);
+                }
             }
 
             AP.Update();

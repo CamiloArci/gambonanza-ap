@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "dgSpecHash": "9qaZW1PZ1uk=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Arci\\Desktop\\Herramientas\\gambonanza-ap\\client\\GambonanzaAP.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Arci\\.nuget\\packages\\archipelago.multiclient.net\\6.5.0\\archipelago.multiclient.net.6.5.0.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\bepinex.analyzers\\1.0.8\\bepinex.analyzers.1.0.8.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\bepinex.baselib\\5.4.20\\bepinex.baselib.5.4.20.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\bepinex.core\\5.4.21\\bepinex.core.5.4.21.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\harmonyx\\2.7.0\\harmonyx.2.7.0.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\mono.cecil\\0.11.4\\mono.cecil.0.11.4.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\monomod.runtimedetour\\21.12.13.1\\monomod.runtimedetour.21.12.13.1.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\monomod.utils\\21.12.13.1\\monomod.utils.21.12.13.1.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\Arci\\.nuget\\packages\\unityengine.modules\\6000.0.50\\unityengine.modules.6000.0.50.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "GambonanzaAP depende de Archipelago.MultiClient.Net (>= 6.4.0), pero no se encontró Archipelago.MultiClient.Net 6.4.0. Archipelago.MultiClient.Net 6.5.0 se resolvió en su lugar.",
+      "projectPath": "C:\\Users\\Arci\\Desktop\\Herramientas\\gambonanza-ap\\client\\GambonanzaAP.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Arci\\Desktop\\Herramientas\\gambonanza-ap\\client\\GambonanzaAP.csproj",
+      "libraryId": "Archipelago.MultiClient.Net",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.7.2"
+      ]
+    },
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "GambonanzaAP depende de UnityEngine.Modules (>= 2022.3.0), pero no se encontró UnityEngine.Modules 2022.3.0. UnityEngine.Modules 6000.0.50 se resolvió en su lugar.",
+      "projectPath": "C:\\Users\\Arci\\Desktop\\Herramientas\\gambonanza-ap\\client\\GambonanzaAP.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Arci\\Desktop\\Herramientas\\gambonanza-ap\\client\\GambonanzaAP.csproj",
+      "libraryId": "UnityEngine.Modules",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.7.2"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = GambonanzaAP
+build_property.ProjectDir = C:\Users\Arci\Desktop\Herramientas\gambonanza-ap\client\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

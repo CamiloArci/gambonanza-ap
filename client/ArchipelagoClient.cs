@@ -21,6 +21,26 @@ namespace GambonanzaAP
         {
             try {
                 Plugin.Log.LogInfo($"Attempting to login as '{user}' on game 'Gambonanza'...");
+                
+                // Validate host:port format to prevent library crashes on bad input
+                if (string.IsNullOrEmpty(server))
+                {
+                    throw new ArgumentException("Server address cannot be empty.");
+                }
+                
+                if (server.Contains(":"))
+                {
+                    string[] parts = server.Split(':');
+                    if (parts.Length >= 2)
+                    {
+                        string portStr = parts[parts.Length - 1];
+                        if (!int.TryParse(portStr, out int port) || port < 1 || port > 65535)
+                        {
+                            throw new ArgumentException("Port must be a valid number between 1 and 65535.");
+                        }
+                    }
+                }
+
                 session = ArchipelagoSessionFactory.CreateSession(server);
                 var version = new System.Version(1, 0, 0);
                 var result = session.TryConnectAndLogin("Gambonanza", user, ItemsHandlingFlags.AllItems, version: version, password: password);
@@ -46,7 +66,7 @@ namespace GambonanzaAP
                 return false;
             } catch (Exception e) {
                 Plugin.Log.LogError($"Critical Error connecting: {e.Message}");
-                return false;
+                throw; // Rethrow to let the UI display the exact message
             }
         }
 
